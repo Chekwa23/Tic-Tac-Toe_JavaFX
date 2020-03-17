@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import com.sun.glass.ui.View;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.stage.Stage;
@@ -17,6 +18,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -35,7 +37,10 @@ public class TicTacToe extends Application{
 	Image ex;
 	Pane root;
 	VBox vbox;
+	HBox hbox;
 	StackPane stackP;
+	StackPane xstack;
+	StackPane ostack;
 	Pane layer1;
 	ImagePattern view;
 	Text text;
@@ -43,7 +48,12 @@ public class TicTacToe extends Application{
 	String draw = "DRAW";
 	String playerx = "Congratulations, X win the game";
 	String playero = "Congratulations, O win the game";
-	Button restart = new Button("Restart");
+	Button restart;
+	Rectangle dem;
+	Rectangle xrect;
+	Rectangle orect;
+	Text xplay;
+	Text oplay;
 	
 	public TicTacToe() throws FileNotFoundException
 	{
@@ -54,17 +64,48 @@ public class TicTacToe extends Application{
 		ex = new Image(srcx);
 		root = new Pane();
 		vbox = new VBox();
+		hbox = new HBox();
 		stackP = new StackPane();
+		xstack = new StackPane();
+		ostack = new StackPane();
 		layer1 = new Pane();
 		view = new ImagePattern(oh);
+		dem = new Rectangle(200,30);
+		xrect = new Rectangle(200,30);
+		orect = new Rectangle(200,30);
 		text = new Text();
+		xplay = new Text("X is playing");
+		oplay = new Text("O is playing");
 		count = 0;
 	}
 
 	
 	
 	@Override
-	public void start(Stage primary) throws Exception { 
+	public void start(Stage primary) throws Exception 
+	{ 
+		restart = new Button("Restart");
+		restart.setPrefSize(80,30);
+		restart.setOnAction(new EventHandler<ActionEvent>() 
+		{
+			@Override
+			public void handle(ActionEvent arg0) 
+			{
+				count = 0;
+				text.setText("");
+				for(int i = 0; i < rectList.size(); i++)
+			    {
+			    	rectList.get(i).setFill(Color.WHITE);
+			    	rectList.get(i).setClick(false);
+			    	rectList.get(i).setOwner("");
+			    }
+		    	view = new ImagePattern(oh);
+		    	vbox.getChildren().removeAll(restart);
+				ostack.getChildren().removeAll(oplay);
+				xstack.getChildren().removeAll(xplay);
+				xstack.getChildren().add(xplay);
+			}
+		});
 		
 		myRectangle rect = null;
 	    for(int i = 0; i<600; i+=200)
@@ -80,13 +121,21 @@ public class TicTacToe extends Application{
 				rectList.add(rect);
 	    	}
 	    }
-	    Button btn = new Button("Heyy");
 	    
+	    dem.setFill(Color.BLUE); 
+	    xrect.setFill(Color.WHITE);
+	    orect.setFill(Color.WHITE);
+	    xplay.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+	    oplay.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+	    xstack.getChildren().addAll(xrect,xplay);
+	    ostack.getChildren().addAll(orect);
+	    hbox.getChildren().add(xstack);
+	    hbox.getChildren().add(dem);
+	    hbox.getChildren().add(ostack);
 	    stackP.getChildren().add(layer1);
 	    stackP.getChildren().add(text);
-	    vbox.getChildren().add(btn);
+	    vbox.getChildren().add(hbox);
 	    vbox.getChildren().add(stackP);
-//	    vbox.getChildren().add(restart);
 	    root.getChildren().add(vbox);
 		
 	    
@@ -112,7 +161,7 @@ public class TicTacToe extends Application{
 			});
 	    }
 	    
-	    Scene scene  = new Scene(root, 600, 655);
+	    Scene scene  = new Scene(root, 600, 670);
 	    primary.setTitle("Tic Tac Toe");
 		primary.setScene(scene);
 		primary.show();
@@ -155,10 +204,15 @@ public class TicTacToe extends Application{
 		if(view.getImage() == ex)
 		{
 			view = new ImagePattern(oh);
+			ostack.getChildren().removeAll(oplay);
+			xstack.getChildren().add(xplay);
+			
 		}
 		else
 		{
 			view = new ImagePattern(ex);
+			xstack.getChildren().removeAll(xplay);
+			ostack.getChildren().add(oplay);
 		}
 	}
 	
@@ -184,27 +238,32 @@ public class TicTacToe extends Application{
 	
 	public void checkGameOver() 
 	{
-//		String temp = "";
-		if(count >= 9 )
+		if(checkWin() == "")
 		{
-			text.setText(draw);
+			if(count >= 9)
+			{
+				text.setText(draw);
+				text.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;");
+				vbox.getChildren().add(restart);
+			}
+			else {}
+		}
+		else 
+		{
+			text.setText(checkWin());
 			text.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;");
+			for(int i = 0; i < rectList.size(); i++)
+		    {
+		    	rectList.get(i).setClick(true);
+		    }
 			vbox.getChildren().add(restart);
 		}
-		else {}
-		System.out.println("eyyy");
-		
-		text.setText(checkWin());
-		text.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;");
-//		vbox.getChildren().add(restart);
-		
 	}
 
 	public String checkWin()
 	{ 
 		String win = "";
 		String owner = "";
-		System.out.println("eyyyyyyyyy");
 		if(((rectList.get(0).getOwner()).equals(rectList.get(1).getOwner()) && (rectList.get(0).getOwner()).equals(rectList.get(2).getOwner())) && rectList.get(0).getClick())
 		{
 			owner = rectList.get(0).getOwner();
@@ -250,6 +309,10 @@ public class TicTacToe extends Application{
 		return win;
 	}
 
+	public void restart() throws FileNotFoundException
+	{
+		new TicTacToe();
+	}
 
 	public static void main(String[] args) {
 		launch(args);
