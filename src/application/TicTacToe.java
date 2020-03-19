@@ -28,7 +28,12 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
-public class TicTacToe extends Application{
+/**
+ * A game of TicTacToe
+ * @author Lucas Onwuchekwa
+ */
+public class TicTacToe extends Application
+{
 	
 	ArrayList<myRectangle> rectList;
 	FileInputStream srcx;
@@ -45,9 +50,9 @@ public class TicTacToe extends Application{
 	ImagePattern view;
 	Text text;
 	int count;
-	String draw = "DRAW";
-	String playerx = "Congratulations, X win the game";
-	String playero = "Congratulations, O win the game";
+	String draw;
+	String playerx;
+	String playero;
 	Button restart;
 	Rectangle dem;
 	Rectangle xrect;
@@ -55,11 +60,17 @@ public class TicTacToe extends Application{
 	Text xplay;
 	Text oplay;
 	
+	/**
+	 * A constructor initializing variables and throwing a FileNotFoundException 
+	 * @throws FileNotFoundException
+	 */
 	public TicTacToe() throws FileNotFoundException
 	{
 		rectList = new ArrayList<>();
-		srcx = new FileInputStream("C:\\Users\\onwuc\\Eclipse2019\\TicTacToe\\x.jpg"); 
-		srco = new FileInputStream("C:\\Users\\onwuc\\Eclipse2019\\TicTacToe\\o.jpg"); 
+// 		srcx = new FileInputStream("C:\\Users\\onwuc\\Eclipse2019\\TicTacToe\\x.jpg"); 
+// 		srco = new FileInputStream("C:\\Users\\onwuc\\Eclipse2019\\TicTacToe\\o.jpg"); 
+		srcx = new FileInputStream("x.jpg"); 
+		srco = new FileInputStream("o.jpg"); 
 		oh = new Image(srco); 
 		ex = new Image(srcx);
 		root = new Pane();
@@ -73,14 +84,18 @@ public class TicTacToe extends Application{
 		dem = new Rectangle(200,30);
 		xrect = new Rectangle(200,30);
 		orect = new Rectangle(200,30);
+		draw = "DRAW";
+		playerx = "Congratulations, X win the game";
+		playero = "Congratulations, O win the game";
 		text = new Text();
 		xplay = new Text("X is playing");
 		oplay = new Text("O is playing");
 		count = 0;
 	}
 
-	
-	
+	/**
+	 * Overriding the default application start method.
+	 */
 	@Override
 	public void start(Stage primary) throws Exception 
 	{ 
@@ -123,8 +138,13 @@ public class TicTacToe extends Application{
 	    }
 	    
 	    dem.setFill(Color.BLUE); 
+	    dem.setStroke(Color.BLACK);
 	    xrect.setFill(Color.WHITE);
+	    xrect.setStroke(Color.BLACK);
 	    orect.setFill(Color.WHITE);
+	    orect.setStroke(Color.BLACK);
+	    text.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;");
+	    text.setFill(Color.BLUE);
 	    xplay.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 	    oplay.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 	    xstack.getChildren().addAll(xrect,xplay);
@@ -167,6 +187,10 @@ public class TicTacToe extends Application{
 		primary.show();
 	}
 	
+	/**
+	 * An inner rectangle class called my rectangle which extends the normal java rectangle class
+	 * @author Lucas Onwuchekwa
+	 */
 	private class myRectangle extends Rectangle
 	{
 		private Boolean clicked;
@@ -199,14 +223,16 @@ public class TicTacToe extends Application{
 		}
 	}
 	
-	public void setView()
+	/**
+	 * Sets the image to be used depending on whose turn it is.
+	 */
+	private void setView()
 	{
 		if(view.getImage() == ex)
 		{
 			view = new ImagePattern(oh);
 			ostack.getChildren().removeAll(oplay);
 			xstack.getChildren().add(xplay);
-			
 		}
 		else
 		{
@@ -216,13 +242,21 @@ public class TicTacToe extends Application{
 		}
 	}
 	
-	public void increaseCount()
+	/**
+	 * Increases the count variable and checks if game is over.
+	 */
+	private void increaseCount()
 	{
 		count++;
 		checkGameOver();
 	}
 	
-	public String imageString(ImagePattern img)
+	/**
+	 * Gets the type of image either ex or oh
+	 * @param img
+	 * @return The type of image as a specified string
+	 */
+	private String imageString(ImagePattern img)
 	{
 		String str = "";
 		if(img.getImage() == ex)
@@ -236,22 +270,25 @@ public class TicTacToe extends Application{
 		return str;
 	}
 	
-	public void checkGameOver() 
+	/**
+	 * Checks if the game is over
+	 */
+	private void checkGameOver() 
 	{
-		if(checkWin() == "")
+		String temp = checkWin();
+		if(temp == "")
 		{
 			if(count >= 9)
 			{
 				text.setText(draw);
-				text.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;");
+				
 				vbox.getChildren().add(restart);
 			}
 			else {}
 		}
 		else 
 		{
-			text.setText(checkWin());
-			text.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;");
+			text.setText(temp);
 			for(int i = 0; i < rectList.size(); i++)
 		    {
 		    	rectList.get(i).setClick(true);
@@ -260,7 +297,11 @@ public class TicTacToe extends Application{
 		}
 	}
 
-	public String checkWin()
+	/**
+	 * Checks who won the game.
+	 * @return The string name o fthe image who won the game eitehr ex or oh.
+	 */
+	private String checkWin()
 	{ 
 		String win = "";
 		String owner = "";
@@ -307,11 +348,6 @@ public class TicTacToe extends Application{
 			win = playerx;
 		}
 		return win;
-	}
-
-	public void restart() throws FileNotFoundException
-	{
-		new TicTacToe();
 	}
 
 	public static void main(String[] args) {
